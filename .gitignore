@@ -1,0 +1,6 @@
+.DS_store
+.vscode
+app/*
+*.swp
+.idea
+.env

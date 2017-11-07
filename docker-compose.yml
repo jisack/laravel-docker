@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+    nginx:
+        build: ./nginx
+        ports:
+            - 8000:80
+        volumes:
+            - ./default.conf:/etc/nginx/conf.d/default.conf
+        links:
+            - php
+            - mysqldb
+        networks:
+            - code-network
+    php: 
+        # image: php:7-fpm
+        build: ./php
+        images: laravel-php
+        volumes:
+            - ./app:/usr/share/nginx/html
+        networks:
+            - code-network
+    myadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        ports:
+            - 8890:80
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOST=mysql
+        restart: always
+        depends_on:
+            - mysqldb
+        networks:
+            - code-network
+
+    mysqldb:
+        image: mysql:5.7.19
+        container_name: mysql
+        restart: always
+        env_file:
+            - ".env"
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        ports:
+            - 3306:3306
+        volumes:
+            - ./data/db/mysql:/var/lib/mysql
+        networks:
+            - code-network
+
+    composer:
+        images: laravel-php
+        working_dir: "/usr/share/nginx/html"
+        volumes:
+            - "./app:/usr/share/nginx/html"
+        command: install
+        networks:
+            - code-network
+
+networks:
+    code-network:
+        driver: bridge
