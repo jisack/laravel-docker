@@ -11,15 +11,14 @@ services:
             - php
             - mysqldb
         networks:
-            - code-network
+            - laravel-network
     php: 
-        # image: php:7-fpm
         build: ./php
         images: laravel-php
         volumes:
             - ./app:/usr/share/nginx/html
         networks:
-            - code-network
+            - laravel-network
     myadmin:
         image: phpmyadmin/phpmyadmin
         container_name: phpmyadmin
@@ -32,14 +31,14 @@ services:
         depends_on:
             - mysqldb
         networks:
-            - code-network
+            - laravel-network
 
     mysqldb:
         image: mysql:5.7.19
         container_name: mysql
         restart: always
         env_file:
-            - ".env"
+            - .env
         environment:
             - MYSQL_DATABASE=${MYSQL_DATABASE}
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -50,17 +49,17 @@ services:
         volumes:
             - ./data/db/mysql:/var/lib/mysql
         networks:
-            - code-network
+            - laravel-network
 
     composer:
         images: laravel-php
-        working_dir: "/usr/share/nginx/html"
+        working_dir: /usr/share/nginx/html
         volumes:
-            - "./app:/usr/share/nginx/html"
+            - ./app:/usr/share/nginx/html
         command: install
         networks:
-            - code-network
+            - laravel-network
 
 networks:
-    code-network:
+    laravel-network:
         driver: bridge
