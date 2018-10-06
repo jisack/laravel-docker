@@ -4,3 +4,4 @@ app/*
 *.swp
 .idea
 .env
+data
